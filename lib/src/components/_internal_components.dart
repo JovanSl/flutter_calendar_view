@@ -220,17 +220,18 @@ class _TimeLineState extends State<TimeLine> {
 
   @override
   Widget build(BuildContext context) {
+    final totalHeight = widget.height + (widget.timeLineOffset * 2);
     return ConstrainedBox(
       key: ValueKey(widget.hourHeight),
       constraints: BoxConstraints(
         maxWidth: widget.timeLineWidth,
         minWidth: widget.timeLineWidth,
-        maxHeight: widget.height,
-        minHeight: widget.height,
+        maxHeight: totalHeight,
+        minHeight: totalHeight,
       ),
       child: Stack(
         children: [
-          for (int i = widget.startHour + 1; i < widget.endHour; i++)
+          for (int i = widget.startHour; i < widget.endHour; i++)
             _timelinePositioned(
               topPosition: widget.hourHeight * (i - widget.startHour) -
                   widget.timeLineOffset,
@@ -238,6 +239,7 @@ class _TimeLineState extends State<TimeLine> {
                   (widget.hourHeight * (i - widget.startHour + 1)) +
                   widget.timeLineOffset,
               hour: i,
+              isFirstHours: i == widget.startHour,
             ),
           if (widget.showHalfHours)
             for (int i = widget.startHour; i < widget.endHour; i++)
@@ -289,6 +291,7 @@ class _TimeLineState extends State<TimeLine> {
     required double topPosition,
     required double bottomPosition,
     required int hour,
+    bool isFirstHours = false,
     int minutes = 0,
   }) {
     final dateTime = DateTime(
@@ -318,7 +321,12 @@ class _TimeLineState extends State<TimeLine> {
                 widget.onTimestampTap!(dateTime);
               }
             },
-            child: widget.timeLineBuilder.call(dateTime),
+            child: Container(
+              margin: isFirstHours
+                  ? EdgeInsets.only(top: widget.timeLineOffset)
+                  : null,
+              child: widget.timeLineBuilder.call(dateTime),
+            ),
           ),
         ),
       ),
@@ -396,11 +404,15 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
         startHour: startHour);
 
     return List.generate(events.length, (index) {
+      final top = events[index].top;
+      final bottom = events[index].bottom;
+      final left = events[index].left;
+      final right = events[index].right;
       return Positioned(
-        top: events[index].top,
-        bottom: events[index].bottom,
-        left: events[index].left,
-        right: events[index].right,
+        top: top,
+        bottom: bottom,
+        left: left,
+        right: right,
         child: GestureDetector(
           onLongPress: () => onTileLongTap?.call(events[index].events, date),
           onTap: () => onTileTap?.call(events[index].events, date),
@@ -416,10 +428,11 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
               date,
               events[index].events,
               Rect.fromLTWH(
-                  events[index].left,
-                  events[index].top,
-                  width - events[index].right - events[index].left,
-                  height - events[index].bottom - events[index].top),
+                events[index].left,
+                events[index].top,
+                width - right - left,
+                height - bottom - top,
+              ),
               events[index].startDuration,
               events[index].endDuration,
             );

@@ -232,9 +232,10 @@ class _InternalDayViewPageState<T extends Object?>
                   : widget.dayViewScrollController,
               physics: widget.scrollPhysics,
               child: SizedBox(
-                height: widget.height,
+                height: widget.height + (widget.timeLineOffset * 2),
                 width: widget.width,
                 child: Stack(
+                  alignment: Alignment.centerLeft,
                   children: [
                     CustomPaint(
                       size: Size(widget.width, widget.height),
@@ -287,6 +288,8 @@ class _InternalDayViewPageState<T extends Object?>
                               widget.quarterHourIndicatorSettings.dashWidth,
                           dashSpaceWidth: widget
                               .quarterHourIndicatorSettings.dashSpaceWidth,
+                          startHour: widget.startHour,
+                          endHour: widget.endHour,
                         ),
                       ),
                     widget.dayDetectorBuilder(

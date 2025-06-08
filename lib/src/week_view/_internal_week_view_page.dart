@@ -405,6 +405,9 @@ class _InternalWeekViewPageState<T extends Object?>
                               widget.quarterHourIndicatorSettings.dashWidth,
                           dashSpaceWidth: widget
                               .quarterHourIndicatorSettings.dashSpaceWidth,
+                          startHour:
+                              widget.quarterHourIndicatorSettings.startHour,
+                          endHour: widget.endHour,
                         ),
                       ),
                     Align(

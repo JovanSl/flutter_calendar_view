@@ -70,7 +70,7 @@ class HourLinePainter extends CustomPainter {
       ..color = lineColor
       ..strokeWidth = lineHeight;
 
-    for (var i = startHour + 1; i < endHour; i++) {
+    for (var i = startHour; i < endHour + 1; i++) {
       final dy = (i - startHour) * minuteHeight * 60;
       if (lineStyle == LineStyle.dashed) {
         var startX = dx;
@@ -205,6 +205,12 @@ class QuarterHourLinePainter extends CustomPainter {
   /// Line dash space width when using the [LineStyle.dashed] style
   final double dashSpaceWidth;
 
+  /// First hour displayed in the layout
+  final int startHour;
+
+  /// This field will be used to set end hour for day and week view
+  final int endHour;
+
   /// Paint quarter hour lines
   QuarterHourLinePainter({
     required this.lineColor,
@@ -212,8 +218,10 @@ class QuarterHourLinePainter extends CustomPainter {
     required this.offset,
     required this.minuteHeight,
     required this.lineStyle,
+    required this.startHour,
     this.dashWidth = 4,
     this.dashSpaceWidth = 4,
+    this.endHour = Constants.hoursADay,
   });
 
   @override
@@ -222,9 +230,9 @@ class QuarterHourLinePainter extends CustomPainter {
       ..color = lineColor
       ..strokeWidth = lineHeight;
 
-    for (var i = 0; i < Constants.hoursADay; i++) {
-      final dy1 = i * minuteHeight * 60 + (minuteHeight * 15);
-      final dy2 = i * minuteHeight * 60 + (minuteHeight * 45);
+    for (var i = startHour; i < endHour; i++) {
+      final dy1 = (i - startHour) * minuteHeight * 60 + (minuteHeight * 15);
+      final dy2 = (i - startHour) * minuteHeight * 60 + (minuteHeight * 45);
 
       if (lineStyle == LineStyle.dashed) {
         var startX = offset;
@@ -246,11 +254,13 @@ class QuarterHourLinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return oldDelegate is HourLinePainter &&
+    return oldDelegate is QuarterHourLinePainter &&
         (oldDelegate.lineColor != lineColor ||
             oldDelegate.offset != offset ||
-            lineHeight != oldDelegate.lineHeight ||
-            minuteHeight != oldDelegate.minuteHeight);
+            oldDelegate.lineHeight != lineHeight ||
+            oldDelegate.minuteHeight != minuteHeight ||
+            oldDelegate.startHour != startHour ||
+            oldDelegate.endHour != endHour);
   }
 }
 
